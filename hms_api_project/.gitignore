@@ -1,0 +1,133 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+coverage.xml
+*.cover
+*.py,cover
+.cache/
+
+# --- Django ---
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# If using Django debug toolbar or similar
+debug_toolbar/
+
+# Migrations (optional to include/exclude)
+# Uncomment ONLY if you want to ignore all migrations
+# **/migrations/
+# **/migrations/*.py
+# **/migrations/*.pyc
+
+# --- Environment variables ---
+.env
+*.env
+.env.*
+!.env.example
+
+# --- Virtual environments ---
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+
+# --- IDE / Editor ---
+.vscode/
+.vscode/settings.json
+.idea/
+.idea/*
+*.iml
+
+# JetBrains PyCharm
+__pycache__/
+*.pyc
+*.pyo
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# --- OS files ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# --- Logs & dumps ---
+*.log
+*.pot
+*.po~
+*.mo
+*.dump
+*.sql
+*.sqlite3
+
+# --- Static & media files ---
+media/
+staticfiles/
+static/
+collected_static/
+
+# --- Docker ---
+*.pid
+docker-compose.override.yml
+
+# --- Heroku / Deploy ---
+# Ignore local build artifacts
+.heroku/
+heroku.yml
+
+# --- Scripts ---
+*.swp
+*.bak
+*.tmp
+
+# --- Other ---
+.Python
+.mypy_cache/
+.dmypy.json
+pyrightconfig.json

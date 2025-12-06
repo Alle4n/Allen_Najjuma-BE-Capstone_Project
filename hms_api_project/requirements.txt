@@ -1,0 +1,11 @@
+Django>=4.2,<5
+djangorestframework>=3.14
+djangorestframework-simplejwt>=5.2.2
+django-environ>=0.12.0
+django-filter>=23.1
+drf-yasg>=1.21.6         # optional for swagger
+Pillow>=10.0.0           # for image uploads
+python-dotenv>=1.0.0     # for environment variables
+gunicorn>=20.1.0         # for Heroku
+whitenoise>=6.5.0        # for static files
+dj-database-url>=1.2.0   # optional convenience
