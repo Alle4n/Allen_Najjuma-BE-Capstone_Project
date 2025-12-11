@@ -19,11 +19,23 @@ from django.urls import path, include
 from rest_framework import routers
 from accounts.views import UserViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.http import JsonResponse
 
 router = routers.DefaultRouter()
 router.register(r"users", UserViewSet)
 
+def home(request):
+    return JsonResponse({
+        "message": "HMS API is running",
+        "endpoints": {
+            "auth_token": "/api/auth/token/",
+            "refresh_token": "/api/auth/token/refresh/",
+            "users": "/api/users/",
+        }
+    })
+
 urlpatterns = [
+    path("", home, name="home"),
     path("admin/", admin.site.urls),
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
