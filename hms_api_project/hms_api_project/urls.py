@@ -1,31 +1,47 @@
-"""
-URL configuration for hms_api_project project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-from accounts.views import UserViewSet
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.http import JsonResponse
+
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from rest_framework_nested.routers import NestedDefaultRouter
+
+from accounts.views import UserViewSet
 from patients.views import PatientViewSet
 from doctors.views import DoctorViewSet
 from appointments.views import AppointmentViewSet
+from records.views import MedicalRecordViewSet
 
-router = routers.DefaultRouter()
-router.register(r"users", UserViewSet)
+
+# -------------------------
+# Base Router
+# -------------------------
+router = DefaultRouter()
+router.register(r"users", UserViewSet, basename="users")
+router.register(r"patients", PatientViewSet, basename="patients")
+router.register(r"doctors", DoctorViewSet, basename="doctors")
+router.register(r"appointments", AppointmentViewSet, basename="appointments")
+router.register(r"records", MedicalRecordViewSet, basename="records")
+
+
+# -------------------------
+# Nested Router
+# /api/patients/{id}/records/
+# -------------------------
+patients_router = NestedDefaultRouter(
+    router,
+    r"patients",
+    lookup="patient"
+)
+patients_router.register(
+    r"records",
+    MedicalRecordViewSet,
+    basename="patient-records"
+)
+
 
 def home(request):
     return JsonResponse({
@@ -34,19 +50,24 @@ def home(request):
             "auth_token": "/api/auth/token/",
             "refresh_token": "/api/auth/token/refresh/",
             "users": "/api/users/",
+            "patients": "/api/patients/",
+            "patient_records": "/api/patients/{id}/records/",
         }
     })
 
+
+# -------------------------
+# URL Patterns
+# -------------------------
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
+
+    # Auth
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    # API Routes
     path("api/", include(router.urls)),
+    path("api/", include(patients_router.urls)),
 ]
-
-
-router.register(r"patients", PatientViewSet)
-router.register(r"doctors", DoctorViewSet)
-router.register(r"appointments", AppointmentViewSet)
-
