@@ -21,6 +21,7 @@ from accounts.views import UserViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.http import JsonResponse
 from patients.views import PatientViewSet
+from doctors.views import DoctorViewSet
 
 router = routers.DefaultRouter()
 router.register(r"users", UserViewSet)
@@ -45,3 +46,4 @@ urlpatterns = [
 
 
 router.register(r"patients", PatientViewSet)
+router.register(r"doctors", DoctorViewSet)

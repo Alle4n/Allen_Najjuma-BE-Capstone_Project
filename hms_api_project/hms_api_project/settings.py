@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     # Local apps
     "accounts",
     "patients",
-    # "doctors",
+    "doctors",
     # "appointments",
     # "records",
     # "attachments",
