@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     "accounts",
     "patients",
     "doctors",
-    # "appointments",
+    "appointments",
     # "records",
     # "attachments",
     # billing, resources...
