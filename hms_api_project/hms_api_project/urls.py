@@ -20,6 +20,7 @@ from rest_framework import routers
 from accounts.views import UserViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.http import JsonResponse
+from patients.views import PatientViewSet
 
 router = routers.DefaultRouter()
 router.register(r"users", UserViewSet)
@@ -41,3 +42,6 @@ urlpatterns = [
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/", include(router.urls)),
 ]
+
+
+router.register(r"patients", PatientViewSet)
