@@ -135,6 +135,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "user": "1000/day",
     },
+    'EXCEPTION_HANDLER': 'hms_api_project.utils.custom_exception_handler',
 }
 
 # JWT configuration

@@ -1,7 +1,16 @@
 from rest_framework import serializers
-from .models import Appointment
+from rest_framework.exceptions import APIException
 from django.utils import timezone
 from datetime import timedelta
+
+from .models import Appointment
+
+
+class AppointmentConflict(APIException):
+    status_code = 409
+    default_detail = "Doctor is already booked for this time slot."
+    default_code = "appointment_conflict"
+
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,33 +20,54 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        Validate appointment_datetime not in past and no overlap for doctor.
+        Business rules:
+        - Cannot schedule appointments in the past
+        - Prevent overlapping appointments for the same doctor
         """
-        appointment_datetime = data.get("appointment_datetime") or getattr(self.instance, "appointment_datetime", None)
-        duration = data.get("duration_minutes") or getattr(self.instance, "duration_minutes", 30)
-        doctor = data.get("doctor") or getattr(self.instance, "doctor", None)
+        appointment_datetime = data.get(
+            "appointment_datetime",
+            getattr(self.instance, "appointment_datetime", None),
+        )
+        duration = data.get(
+            "duration_minutes",
+            getattr(self.instance, "duration_minutes", None),
+        )
+        doctor = data.get(
+            "doctor",
+            getattr(self.instance, "doctor", None),
+        )
 
-        if appointment_datetime and appointment_datetime < timezone.now():
-            raise serializers.ValidationError("Cannot schedule appointment in the past.")
+        if not appointment_datetime or not doctor or not duration:
+            return data
 
-        # Check overlap: find other appointments for this doctor whose times overlap.
-        if doctor and appointment_datetime:
-            start = appointment_datetime
-            end = appointment_datetime + timedelta(minutes=duration)
+        if appointment_datetime < timezone.now():
+            raise serializers.ValidationError({
+                "appointment_datetime": "Cannot schedule appointment in the past."
+            })
 
-            qs = Appointment.objects.filter(doctor=doctor, status="scheduled")
-            if self.instance:
-                qs = qs.exclude(pk=self.instance.pk)
+        start_time = appointment_datetime
+        end_time = start_time + timedelta(minutes=duration)
 
-            # overlap if other.start < end and other.end > start
-            for other in qs:
-                other_start = other.appointment_datetime
-                other_end = other_start + timedelta(minutes=other.duration_minutes)
-                if other_start < end and other_end > start:
-                    raise serializers.ValidationError(f"Doctor is already booked for {other_start} - {other_end} (appointment id {other.id})")
+        qs = Appointment.objects.filter(
+            doctor=doctor,
+            status="scheduled",
+            appointment_datetime__lt=end_time,
+        )
+
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        for existing in qs:
+            existing_start = existing.appointment_datetime
+            existing_end = existing_start + timedelta(minutes=existing.duration_minutes)
+
+            if existing_start < end_time and existing_end > start_time:
+                raise AppointmentConflict()
+
         return data
 
     def create(self, validated_data):
-        user = self.context["request"].user
-        validated_data["created_by"] = user
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            validated_data["created_by"] = request.user
         return super().create(validated_data)
